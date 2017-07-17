@@ -39,14 +39,13 @@ def solvr(y, t, mu, sigma, tau, delta, beta):
 def seir(request):
     a_t = np.arange(196)
 
-    N = 1885542
+    N = float(request.GET['paraN']) or 1885542
     init = [N - 1, 0, 1, 0]
-
-    mu = 1 / (3494 * 7)
-    sigma = 1 / 7
-    delta = (0.0035 / 7)
-    tau = 1 / 7
-    beta = 2.6389 / 7 / N
+    mu = float(request.GET['paramu']) or 1 / (3494 * 7)
+    sigma=float(request.GET['parasigma']) or 1 / 7
+    delta=float(request.GET['paradelta']) or (0.0035 / 7)
+    tau=float(request.GET['paratau']) or 1 / 7
+    beta=float(request.GET['parabeta']) or 2.6389 / 7 / N
     asol = integrate.odeint(solvr, init, a_t, args=(mu, sigma, tau, delta, beta))    
     asol = np.insert(asol, 0, a_t, axis=1)
 
