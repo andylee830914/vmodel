@@ -14,10 +14,10 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
-
-     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script> 
+    <title>Dengue Simulation</title>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script> 
     <script type="text/javascript">
-        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.load('current', { 'packages': ['corechart', 'controls'] });
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
@@ -33,7 +33,7 @@
             
             for (var index = 0; index < jsonData.length; index++) {
                 var element = jsonData[index];
-                element[0] = parseInt(element[0]).toString();
+                element[0] = parseInt(element[0]);
                 man[index] = element.slice(0, 5);
                 mos[index] = element.slice(5); 
                 mos[index].unshift(element[0]);    
@@ -43,28 +43,56 @@
             man.unshift(['date', 'S', 'E', 'I', 'R']);
             mos.unshift(['date', 'Ev', 'Lv', 'Pv', 'Sm' , 'Em', 'Im']);
             
+            var mandashboard = new google.visualization.Dashboard(
+                    document.getElementById('dashboard_man'));
+            var mosdashboard = new google.visualization.Dashboard(
+                    document.getElementById('dashboard_mos'));
 
+            var manSlider = new google.visualization.ControlWrapper({
+                'controlType': 'NumberRangeFilter',
+                'containerId': 'filter_man',
+                'options': {
+                    'filterColumnLabel': 'date'
+                }
+            });
+            var mosSlider = new google.visualization.ControlWrapper({
+                    'controlType': 'NumberRangeFilter',
+                    'containerId': 'filter_mos',
+                    'options': {
+                        'filterColumnLabel': 'date'
+                    }
+                });
             var man_data = google.visualization.arrayToDataTable(man);
             var mos_data = google.visualization.arrayToDataTable(mos);
             
 
-            var man_options = {
-                title: 'Human Simulation',
-                curveType: 'function',
-                legend: { position: 'bottom' }
-            };
-            var mos_options = {
-                    title: 'Mosquito Simulation',
-                    curveType: 'function',
-                    legend: { position: 'bottom' }
-            };
-
-            var chart1 = new google.visualization.LineChart(document.getElementById('man_chart'));
-            var chart2 = new google.visualization.LineChart(document.getElementById('mos_chart'));
+            var manChart = new google.visualization.ChartWrapper({
+                    'chartType': 'LineChart',
+                    'containerId': 'man_chart',
+                    'options': {
+                        'width': 900,
+                        'height': 500,
+                        'pieSliceText': 'value',
+                        'legend': 'right',
+                        'title': 'Human Simulation'
+                    }
+                });
+            var mosChart = new google.visualization.ChartWrapper({
+                    'chartType': 'LineChart',
+                    'containerId': 'mos_chart',
+                    'options': {
+                        'width': 900,
+                        'height': 500,
+                        'pieSliceText': 'value',
+                        'legend': 'right',
+                        'title': 'Mosquito Simulation'                        
+                    }
+                });
+            mandashboard.bind(manSlider, manChart);
+            mosdashboard.bind(mosSlider, mosChart);
             
-
-            chart1.draw(man_data, man_options);
-            chart2.draw(mos_data, mos_options);
+            mandashboard.draw(man_data);
+            mosdashboard.draw(mos_data);
             
         }
 </script>
@@ -106,8 +134,17 @@
     </nav>
     <div class="container">
     <div class="col-md-9">
-        <div id="man_chart" style="width: 900px; height: 500px"></div>
-        <div id="mos_chart" style="width: 900px; height: 500px"></div>
+        <div id="dashboard_man">
+            <div id="man_chart" style="margin-left:-50px;"></div>            
+            <div id="filter_man"  style="text-align:center; min-width: 500px"></div>
+
+        </div>
+
+        <div id="dashboard_mos">
+            <div id="mos_chart" style="margin-left:-50px;"></div>
+            <div id="filter_mos"  style="text-align:center; min-width: 500px"></div>
+
+        </div>
     </div>
     <div class="col-md-3">
         <div id="scheme" class="btn-group" role="group" aria-label="...">
