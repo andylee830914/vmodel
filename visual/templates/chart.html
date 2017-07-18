@@ -29,26 +29,45 @@
                 async: false
             }).responseText;
             jsonData = JSON.parse(jsonData);
-            // console.log(jsonData);
+            console.log(jsonData);
+            var man = [];
+            var mos = [];
+            
             for (var index = 0; index < jsonData.length; index++) {
                 var element = jsonData[index];
-                jsonData[index][0] = parseInt(element[0]).toString();
+                element[0] = parseInt(element[0]).toString();
+                man[index] = element.slice(0, 5);
+                mos[index] = element.slice(5); 
+                mos[index].unshift(element[0]);    
+                
             }
             // console.log(jsonData);
-            jsonData.unshift(['date', 'S', 'E', 'I', 'R']);
-            console.log(jsonData);
+            man.unshift(['date', 'S', 'E', 'I', 'R']);
+            mos.unshift(['date', 'Ev', 'Lv', 'Pv', 'Sm' , 'Em', 'Im']);
+            
 
-            var data = google.visualization.arrayToDataTable(jsonData);
+            var man_data = google.visualization.arrayToDataTable(man);
+            var mos_data = google.visualization.arrayToDataTable(mos);
+            
 
-            var options = {
-                title: 'Simulation',
+            var man_options = {
+                title: 'Man Simulation',
                 curveType: 'function',
                 legend: { position: 'bottom' }
             };
+            var mos_options = {
+                    title: 'Mos Simulation',
+                    curveType: 'function',
+                    legend: { position: 'bottom' }
+            };
 
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            var chart1 = new google.visualization.LineChart(document.getElementById('man_chart'));
+            var chart2 = new google.visualization.LineChart(document.getElementById('mos_chart'));
+            
 
-            chart.draw(data, options);
+            chart1.draw(man_data, man_options);
+            chart2.draw(mos_data, mos_options);
+            
         }
 </script>
     <style>
@@ -89,7 +108,8 @@
     </nav>
     <div class="container">
     <div class="col-md-9">
-        <div id="curve_chart" style="width: 900px; height: 500px"></div>
+        <div id="man_chart" style="width: 900px; height: 500px"></div>
+        <div id="mos_chart" style="width: 900px; height: 500px"></div>
     </div>
     <div class="col-md-3">
         <div id="scheme" class="btn-group" role="group" aria-label="...">
