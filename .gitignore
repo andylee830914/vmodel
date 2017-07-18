@@ -13,4 +13,4 @@ tests/.coverage
 build/
 tests/report/
 kernel-a4b67b10-e821-446d-bdda-79c8debe522b.json
-.vscode/*
+.vscode/
