@@ -15,21 +15,19 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
 
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script> 
     <script type="text/javascript">
         google.charts.load('current', { 'packages': ['corechart'] });
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
             var str = $("#parameters").serialize();
-            console.log(str);
             var jsonData = $.ajax({
                 url: "http://127.0.0.1:8000/api/seir?"+str,
                 dataType: "json",
                 async: false
             }).responseText;
             jsonData = JSON.parse(jsonData);
-            console.log(jsonData);
             var man = [];
             var mos = [];
             
@@ -51,12 +49,12 @@
             
 
             var man_options = {
-                title: 'Man Simulation',
+                title: 'Human Simulation',
                 curveType: 'function',
                 legend: { position: 'bottom' }
             };
             var mos_options = {
-                    title: 'Mos Simulation',
+                    title: 'Mosquito Simulation',
                     curveType: 'function',
                     legend: { position: 'bottom' }
             };
@@ -119,12 +117,19 @@
             <button type="button" class="btn btn-default" id="m3">M3</button>            
         </div>
         <form id="parameters">
-            {% for para,default in parameter.items %}
-            <div class="form-group">
-                <label for="para{{para}}">{{ para }}</label>
-                <input type="text" class="form-control" name="para{{para}}" id="para{{para}}" placeholder="{{para}}" value="{{default}}">
+            {% autoescape off %}            
+            {% for para,default in pasort %}
+                 {% if default.show == 1 %}
+                    <div class="form-group bas">    
+                 {% else %}
+                    <div class="form-group adv" style="display:none"> 
+                 {% endif %}
+                <label for="para{{para}}">{{default.name | safe}}</label>
+                <input type="text" class="form-control" name="para{{para}}" id="para{{para}}" placeholder="{{para}}" value="{{default.default}}">
             </div>
             {% endfor %}
+            {% endautoescape %}
+            <a id="advance">Adavance Mode</a><a id="basic" style="display:none" >Basic Mode</a><br><br>
             <button type="button" class="btn btn-default" onclick="drawChart()">Submit</button>
         </form>
     </div>
@@ -134,13 +139,48 @@
 </body>
 <script>
     $("#m0").click(function () {
-        var data = {
-            'N': 1885542, 'beta': 2.6389 / 7 / 1885542, 'mu': 1 /
-                (3494 * 7), 'sigma': 1 / 7, 'delta': 0.0035 / 7, 'tau': 1 / 7
-        };
+        var data = parameter = {
+        'N' : 500000,
+        'M' : 0,
+        'beta_h': 0.75,
+        'theta_h': 0.1,
+        'gama': 0.143,
+        'beta_m': 0.375,
+        'theta_m': 0.2,
+        'f_e': 0.276,
+        'f_l': 0.11,
+        'f_p': 0.253,
+        'mu_e': 0.05,
+        'mu_l': 0.05,
+        'mu_p': 0.0167,
+        'mu_m': 0.047,
+        'pi': 1,
+        'delta_l': 0.01,
+        'sigma': 0.5,
+        'budget': 1000000,
+        'perNetCost': 400,
+        'eps': 0.67,
+        'sprayTime': '[10, 100, 150, 200]',
+        'alpha': 1 / 75000,
+        'waterTime': '[]',
+        'k': 1000,
+        'c': 0
+    }
         for (var key in data) {
             $("#para"+key).val(data[key]);
         }
+    });
+
+
+    $("#advance").click(function () {
+        $(".adv").show();
+        $(this).hide();
+        $("#basic").show();
+    });
+    $("#basic").click(function () {
+        $(".adv").hide();
+        $(this).hide();
+        $("#advance").show();
     });
 </script>
 

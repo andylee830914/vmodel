@@ -4,50 +4,46 @@ from django.shortcuts import render
 
 
 def seir(request):
-
-    parameter = {'N': 1885542, 'beta': 2.6389 / 7 / 1885542, 'mu': 1 /
-                 (3494 * 7), 'sigma': 1 / 7, 'delta': 0.0035 / 7, 'tau': 1 / 7}
-
     
-
-
-    #human parameters
     parameter = {
-        'N' : 500000,
-        'M' : 0,
-        'beta_h': 0.75,
-        'theta_h': 0.1,
-        'gama': 0.143,
+        # human parameters
+        'N'         : {'name': r'N'             ,'show': 1 , 'default': 500000},
+        'M'         : {'name': r'M'             ,'show': 1 , 'default': 0},
+        'beta_h'    : {'name': r'\(\beta_h\)'   ,'show': 1 , 'default': 0.75},
+        'theta_h'   : {'name': r'\(\theta_h\)'  ,'show': 1 , 'default': 0.1},
+        'gama'      : {'name': r'\(\gamma\)'    ,'show': 1 , 'default': 0.143},
 
-        #mosquito paraneters
-        'beta_m': 0.375,
-        'theta_m': 0.2,
-        'f_e': 0.276,
-        'f_l': 0.11,
-        'f_p': 0.253,
-        'mu_e': 0.05,
-        'mu_l': 0.05,
-        'mu_p': 0.0167,
-        'mu_m': 0.047,
-        'pi': 1,
-        'delta_l': 0.01,
-        'sigma': 0.5,
+        # mosquito paraneters
+        'beta_m'    : {'name': r'\(\beta _m\)'  ,'show': 0 , 'default': 0.375},
+        'theta_m'   : {'name': r'\(\theta _m\)' ,'show': 0 , 'default': 0.2},
+        'f_e'       : {'name': r'\(f_e\)'       ,'show': 0 , 'default': 0.276},
+        'f_l'       : {'name': r'\(f_l\)'       ,'show': 0 , 'default': 0.11},
+        'f_p'       : {'name': r'\(f_p\)'       ,'show': 0 , 'default': 0.253},
+        'mu_e'      : {'name': r'\(\mu_e\)'     ,'show': 0 , 'default': 0.05},
+        'mu_l'      : {'name': r'\(\mu_l\)'     ,'show': 0 , 'default': 0.05},
+        'mu_p'      : {'name': r'\(\mu_p\)'     ,'show': 0 , 'default': 0.0167},
+        'mu_m'      : {'name': r'\(\mu_m\)'     ,'show': 0 , 'default': 0.047},
+        'pi'        : {'name': r'\(\pi\)'       ,'show': 0 , 'default': 1},
+        'delta_l'   : {'name': r'\(\delta_l\)'  ,'show': 0 , 'default': 0.01},
+        'sigma'     : {'name': r'\(\sigma\)'    ,'show': 0 , 'default': 0.5},
 
-        #intervention parameters
-        'budget': 1000000,
-        #1 bed net
-        'perNetCost': 400,
-        'eps': 0.67,
-        #2 spray
+        # intervention parameters
+        'budget'    : {'name': r'budget'        ,'show': 1 , 'default': 1000000},
+        # 1 bed net
+        'perNetCost': {'name': r'perNetCost'    ,'show': 1 , 'default': 400},
+        'eps'       : {'name': r'\(\epsilon\)'  ,'show': 1 , 'default': 0.67},
+        # 2 spray
         # the money of spray eaxh time?
-        'sprayTime': [50, 100, 150, 200],  # [50,100,150,200]
-        'alpha': 1 / 75000,
+        # [50,100,150,200]
+        'sprayTime' : {'name': r'sprayTime'     ,'show': 1 , 'default': [50, 100, 150, 200]},
+        'alpha'     : {'name': r'\(\alpha\)'    ,'show': 1 , 'default': 1 / 75000},
 
-        #3 removing water container
+        # 3 removing water container
         # the money of removing each time
-        'waterTime': [],  # [50,100,150,200]
-        'k': 1000,
-        'c': 0
+        'waterTime' : {'name': r'waterTime'      ,'show': 1 , 'default': []},  # [50,100,150,200]
+        'k'         : {'name': r'k'              ,'show': 1 , 'default': 1000},
+        'c'         : {'name': r'c'              ,'show': 1 , 'default': 0}
     }
-
-    return render(request, 'chart.html', {'parameter': parameter})
+    pasort = sorted(parameter.items(), key=lambda x: x[1]['show'], reverse=True)
+    
+    return render(request, 'chart.html', {'parameter': parameter, 'pasort': pasort})
