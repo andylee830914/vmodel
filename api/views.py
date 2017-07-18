@@ -128,7 +128,7 @@ def seir(request):
     asol = np.insert(asol, 0, a_t, axis=1)
 
     # asol = np.concatenate(([['date', 'S', 'E', 'I', 'R']], asol))
-    mystr = json.dumps(asol, cls=MyEncoder)
+    mystr = json.dumps(asol, cls=MyEncoder, indent=4, separators=(',', ': '))
     return HttpResponse(mystr,  content_type='application/json')
 
 
