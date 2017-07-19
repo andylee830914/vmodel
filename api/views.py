@@ -84,13 +84,10 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
         lay = 0
 
     devdt = pi * lay * M - (f_e + mu_e + k_e) * Ev
-    dlvdt = f_e * Ev - \
-        (f_l + mu_l * (1 + r * float(Ev + Lv) / float(K)) + w_l + k_l) * Lv
+    dlvdt = f_e * Ev - (f_l + mu_l * (1 + r * float(Ev + Lv) / float(K)) + w_l + k_l) * Lv
     dpvdt = f_l * Lv - (f_p + mu_p + k_p) * Pv
-    dsmdt = sigma * f_p * Pv - \
-        (mu_m + w_Sm + float(beta_m * Ih * (1 - eps * b)) / float(N)) * Sm
-    demdt = float(beta_m * Ih * (1 - eps * b)) / float(N) * \
-        Sm - (theta_m + mu_m + w_Em) * Em
+    dsmdt = sigma * f_p * Pv - (mu_m + w_Sm + float(beta_m * Ih * (1 - eps * b)) / float(N)) * Sm
+    demdt = float(beta_m * Ih * (1 - eps * b)) / float(N) * Sm - (theta_m + mu_m + w_Em) * Em
     dimdt = theta_m * Em - (mu_m + w_Im) * Im
 
     return [dshdt, dehdt, dihdt, drhdt, devdt, dlvdt, dpvdt, dsmdt, demdt, dimdt, dkdt]
