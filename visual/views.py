@@ -37,7 +37,7 @@ def model(request):
         # the money of spray eaxh time?
         # [50,100,150,200]
         'perPestCost'   : {'name': r'perPestCost'   ,'show': 1 , 'default': 0.38},
-        'perWorkLength' : {'name': r'perWorkLength' ,'show': 1 , 'default': 1*1000},        
+        'perWorkLength' : {'name': r'perWorkLength' ,'show': 1 , 'default': 1*1000*8},        
         'sprayTime'     : {'name': r'sprayTime'     ,'show': 1 , 'default': []},
         'area'          : {'name': r'area'          ,'show': 0 , 'default': 5.709296*1000000},
         'roadLength'    : {'name': r'roadLength'    ,'show': 0 , 'default': 527.927*1000},

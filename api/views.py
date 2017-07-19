@@ -27,11 +27,12 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
           waterTime):
 
     #human init
+#human init
     Sh = y[0]
     Eh = y[1]
     Ih = y[2]
     Rh = y[3]
-    N = Sh + Eh + Ih + Rh
+    N  =  Sh + Eh + Ih + Rh
 
     #mosquito init
     Ev = y[4]
@@ -46,51 +47,52 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
     K = y[10]
 
     #human model
-    dshdt = -  float(beta_h * Im * (1 - eps * b)) / float(M) * Sh
-    dehdt = float(beta_h * Im * (1 - eps * b)) / float(M) * Sh - theta_h * Eh
-    dihdt = theta_h * Eh - gama * Ih
-    drhdt = gama * Ih
+    dshdt =                                               -  float(beta_h * Im * (1-eps*b))/float(N)  * Sh
+    dehdt = float(beta_h * Im * (1-eps*b))/float(N) * Sh  -  theta_h                                  * Eh
+    dihdt = theta_h                 * Eh                  -  gama                                     * Ih
+    drhdt = gama                    * Ih
 
     #mosiquito model
     if math.floor(t) in sprayTime:
-        w_l = (1 - f_l - mu_l * (1 + r * float(Ev + Lv) / float(K))) * w
-        w_Sm = (1 - float(beta_m * Ih * (1 - eps * b)) / float(N) - mu_m) * w
-        w_Em = (1 - theta_m - mu_m) * w
-        w_Im = (1 - mu_m) * w
+        w_l = (1-f_l-mu_l*(1+r*float(Ev+Lv+Pv)/float(K)))*w
+        w_Sm = (1-float(beta_m*Ih * (1-eps*b))/float(M)-mu_m)*w
+        w_Em = (1-theta_m-mu_m)*w
+        w_Im = (1-mu_m)*w
     else:
         w_l = 0
         w_Sm = 0
         w_Em = 0
         w_Im = 0
 
+
     if math.floor(t) in waterTime:
-        k = float(c) / float(K)
-        if k > 1:
-            k = 1
+        k = c
+        if k > 1: k = 1
 
-        k_e = (1 - f_e - mu_e) * k
-        k_l = (1 - f_l - mu_l * (1 + r * float(Ev + Lv) / float(K))) * k
-        k_p = (1 - f_p - mu_p) * k
+        k_e = (1-f_e-mu_e)*k
+        k_l = (1-f_l-mu_l*(1+r*float(Ev+Lv)/float(K)))*k
+        k_p = (1-f_p-mu_p)*k
 
-        dkdt = -k * K
+        dkdt = -k*K
     else:
         k_e = 0
         k_l = 0
         k_p = 0
         dkdt = 0
 
-    lay = 1 - float(Ev + Lv + Pv) / float(K * 125)
+    lay = 1-float(Ev+Lv+Pv)/float(K*50)
     if lay < 0:
         lay = 0
 
-    devdt = pi * lay * M - (f_e + mu_e + k_e) * Ev
-    dlvdt = f_e * Ev - (f_l + mu_l * (1 + r * float(Ev + Lv) / float(K)) + w_l + k_l) * Lv
-    dpvdt = f_l * Lv - (f_p + mu_p + k_p) * Pv
-    dsmdt = sigma * f_p * Pv - (mu_m + w_Sm + float(beta_m * Ih * (1 - eps * b)) / float(N)) * Sm
-    demdt = float(beta_m * Ih * (1 - eps * b)) / float(N) * Sm - (theta_m + mu_m + w_Em) * Em
-    dimdt = theta_m * Em - (mu_m + w_Im) * Im
+    devdt = pi * lay                              * M   -  (f_e + mu_e*(1+r*float(Ev+Lv+Pv)/float(K)) + k_e)         * Ev
+    dlvdt = f_e                                   * Ev  -  (f_l + mu_l*(1+r*float(Ev+Lv+Pv)/float(K)) + w_l + k_l)   * Lv
+    dpvdt = f_l                                   * Lv  -  (f_p + mu_p*(1+r*float(Ev+Lv+Pv)/float(K)) + k_p)         * Pv
+    dsmdt = sigma * f_p                           * Pv  -  (mu_m + w_Sm + float(beta_m*Ih * (1-eps*b))/float(M))     * Sm
+    demdt = float(beta_m*Ih * (1-eps*b))/float(M) * Sm  -  (theta_m + mu_m + w_Em)                                   * Em
+    dimdt = theta_m                               * Em  -  (mu_m + w_Im)                                             * Im
 
-    return [dshdt, dehdt, dihdt, drhdt, devdt, dlvdt, dpvdt, dsmdt, demdt, dimdt, dkdt]
+
+    return [dshdt,dehdt,dihdt,drhdt,devdt,dlvdt,dpvdt,dsmdt,demdt,dimdt,dkdt]
 
 
 
@@ -163,11 +165,12 @@ def model(request):
     waterTime = ast.literal_eval(request.GET['parawaterTime'])
     if len(waterTime) != 0:
         perTimeBudget2 = float(budget) / float(len(waterTime))
-        c = float(perTimeBudget2) / float(perWorkCost) * 2.503 * 10
+        c = float(perTimeBudget2) / \
+            ((float(roadLength) / 171710 * 298) * float(perWorkCost))
     else :
         c = 0
     
-    init = [N-1,0,1,0,70000,110000,50000,30000,0,0,89742]
+    init = [N - 20001, 0, 1, 20000, 30000, 110000, 50000, 40000, 0, 0, 89742]
     asol = integrate.odeint(solvr, init, a_t, args=(beta_h, theta_h, gama, beta_m,
                                                     theta_m, f_e, f_l, f_p, mu_e, mu_l, mu_p, mu_m, pi, r, sigma, b, eps,
                                                     w, sprayTime, c, waterTime))
