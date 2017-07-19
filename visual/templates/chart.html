@@ -23,7 +23,7 @@
         function drawChart() {
             var str = $("#parameters").serialize();
             var jsonData = $.ajax({
-                url: "http://127.0.0.1:8000/api/seir?" + str,
+                url: "http://127.0.0.1:8000/api/?" + str,
                 dataType: "json",
                 async: false
             }).responseText;
