@@ -31,7 +31,7 @@ def model(request):
         'perWorkCost'   : {'name': r'perWorkCost'   ,'show': 1, 'default': 1064},
         
         # 1 bed net
-        'perNetCost'    : {'name': r'perNetCost'    ,'show': 1 , 'default': 0},
+        'perNetCost'    : {'name': r'perNetCost'    ,'show': 1 , 'default': 90},
         'eps'           : {'name': r'\(\epsilon\)'  ,'show': 0 , 'default': 0.67},
         # 2 spray
         # the money of spray eaxh time?
