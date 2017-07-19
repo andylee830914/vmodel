@@ -23,7 +23,8 @@ class MyEncoder(json.JSONEncoder):
 
 
 def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
-          mu_e, mu_l, mu_p, mu_m, pi, delta_l, sigma, b, eps, alpha, sprayTime, k, c, waterTime):
+          mu_e, mu_l, mu_p, mu_m, pi, r, sigma, b, eps, w, sprayTime, c,
+          waterTime):
 
     #human init
     Sh = y[0]
@@ -41,40 +42,64 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
     Im = y[9]
     M = Sm + Em + Im
 
+    #environmental init
+    K = y[10]
+
     #human model
-    dshdt = -  beta_h * Im * (1 - eps * b) * Sh
-    dehdt = beta_h * Im * (1 - eps * b) * Sh - theta_h * Eh
+    dshdt = -  float(beta_h * Im * (1 - eps * b)) / float(M) * Sh
+    dehdt = float(beta_h * Im * (1 - eps * b)) / float(M) * Sh - theta_h * Eh
     dihdt = theta_h * Eh - gama * Ih
     drhdt = gama * Ih
 
     #mosiquito model
-    V=100
     if math.floor(t) in sprayTime:
-        w_bar = 0.99 * (1 - np.exp(float(-V) / alpha * (Lv + Sm + Em + Im)))
+        w_l = (1 - f_l - mu_l * (1 + r * float(Ev + Lv) / float(K))) * w
+        w_Sm = (1 - float(beta_m * Ih * (1 - eps * b)) / float(N) - mu_m) * w
+        w_Em = (1 - theta_m - mu_m) * w
+        w_Im = (1 - mu_m) * w
     else:
-        w_bar = 0
+        w_l = 0
+        w_Sm = 0
+        w_Em = 0
+        w_Im = 0
 
     if math.floor(t) in waterTime:
-        k = k - c
+        k = float(c) / float(K)
+        if k > 1:
+            k = 1
+
+        k_e = (1 - f_e - mu_e) * k
+        k_l = (1 - f_l - mu_l * (1 + r * float(Ev + Lv) / float(K))) * k
+        k_p = (1 - f_p - mu_p) * k
+
+        dkdt = -k * K
     else:
-        pass
+        k_e = 0
+        k_l = 0
+        k_p = 0
+        dkdt = 0
 
-    devdt = pi * (1 - float(Ev + Lv + Pv) / float(k * 125)) * \
-        M - (f_e + mu_e) * Ev
-    dlvdt = f_e * Ev - (f_l + mu_l + delta_l * Lv + w_bar) * Lv
-    dpvdt = f_l * Lv - (f_p + mu_p) * Pv
+    lay = 1 - float(Ev + Lv + Pv) / float(K * 125)
+    if lay < 0:
+        lay = 0
+
+    devdt = pi * lay * M - (f_e + mu_e + k_e) * Ev
+    dlvdt = f_e * Ev - \
+        (f_l + mu_l * (1 + r * float(Ev + Lv) / float(K)) + w_l + k_l) * Lv
+    dpvdt = f_l * Lv - (f_p + mu_p + k_p) * Pv
     dsmdt = sigma * f_p * Pv - \
-        (mu_m + w_bar + beta_m * Ih * (1 - eps * b)) * Sm
-    demdt = beta_m * Ih * (1 - eps * b) * Sm - (theta_m + mu_m + w_bar) * Em
-    dimdt = theta_m * Em - (mu_m + w_bar) * Im
+        (mu_m + w_Sm + float(beta_m * Ih * (1 - eps * b)) / float(N)) * Sm
+    demdt = float(beta_m * Ih * (1 - eps * b)) / float(N) * \
+        Sm - (theta_m + mu_m + w_Em) * Em
+    dimdt = theta_m * Em - (mu_m + w_Im) * Im
 
-    return [dshdt, dehdt, dihdt, drhdt, devdt, dlvdt, dpvdt, dsmdt, demdt, dimdt]
+    return [dshdt, dehdt, dihdt, drhdt, devdt, dlvdt, dpvdt, dsmdt, demdt, dimdt, dkdt]
 
 
 
 
 def model(request):
-    a_t = np.arange(215)
+    a_t = np.arange(200)
     # for key in request.GET:
     #     pa = key[4:].strip()
     #     if pa == "sprayTime" or pa == "waterTime":
@@ -83,7 +108,6 @@ def model(request):
     #     else :
     #         locals()['{0}'.format(pa)]= float(request.GET.getlist(key)[0])
     N = float(request.GET['paraN'])
-    M = float(request.GET['paraM'])
 
 
     #human parameters
@@ -102,29 +126,54 @@ def model(request):
     mu_p = float(request.GET['paramu_p'])
     mu_m = float(request.GET['paramu_m'])
     pi = float(request.GET['parapi'])
-    delta_l = float(request.GET['paradelta_l'])
+    r = float(request.GET['parar'])
     sigma = float(request.GET['parasigma'])
 
     #intervention parameters
     budget = float(request.GET['parabudget'])
+    perWorkCost = float(request.GET['paraperWorkCost'])  # basic (unit:NT$)
+
     #1 bed net
     perNetCost = float(request.GET['paraperNetCost'])
-    b = float(budget) / float(perNetCost) / float(N)
+
+    if float(perNetCost)==0 :
+        b=0
+    else:
+        b = float(budget) / float(perNetCost) / float(N)
+
     eps = float(request.GET['paraeps'])
     #2 spray
     # the money of spray eaxh time?
-    sprayTime = ast.literal_eval(request.GET['parasprayTime'])
-    alpha = float(request.GET['paraalpha'])
+    # bascic (unit: NT$/ml)
+    perPestCost = float(request.GET['paraperPestCost'])
+    # advanced (unit:meter)
+    perWorkLength = float(request.GET['paraperWorkLength'])
+    sprayTime = ast.literal_eval(request.GET['parasprayTime'])  # advanced
+    area = float(request.GET['paraarea'])  # advanced (unit: m-square)
+    roadLength = float(request.GET['pararoadLength'])  # advanced (unit: meter)
+    if len(sprayTime)!=0:
+        perTimeBudget1 = float(budget)/float(len(sprayTime))
+        roadDensity = float(roadLength) / float(area)
+        sprayArea = float(perTimeBudget1)/float(0.04*perPestCost+float(roadDensity)/float(perWorkLength)*perWorkCost)
+        w = float(sprayArea)/float(area)
+        if w > 1: w = 1
+    else:
+        w=0
 
     #3 removing water container
     # the money of removing each time
-    waterTime = ast.literal_eval(request.GET['parawaterTime'])
     k = float(request.GET['parak'])
-    c = float(request.GET['parac'])
-    init = [N - 1, 0, 1, 0, 1, 1, 1, 1, 0, 0]
+    waterTime = ast.literal_eval(request.GET['parawaterTime'])
+    if len(waterTime) != 0:
+        perTimeBudget2 = float(budget) / float(len(waterTime))
+        c = float(perTimeBudget2) / float(perWorkCost) * 2.503 * 10
+    else :
+        c = 0
+    
+    init = [N-1,0,1,0,70000,110000,50000,30000,0,0,89742]
     asol = integrate.odeint(solvr, init, a_t, args=(beta_h, theta_h, gama, beta_m,
-                                                    theta_m, f_e, f_l, f_p, mu_e, mu_l, mu_p, mu_m, pi, delta_l, sigma, b, eps,
-                                                    alpha, sprayTime, k, c, waterTime))
+                                                    theta_m, f_e, f_l, f_p, mu_e, mu_l, mu_p, mu_m, pi, r, sigma, b, eps,
+                                                    w, sprayTime, c, waterTime))
     asol = np.insert(asol, 0, a_t, axis=1)
 
     # asol = np.concatenate(([['date', 'S', 'E', 'I', 'R']], asol))

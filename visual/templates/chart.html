@@ -15,7 +15,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
         crossorigin="anonymous"></script>
     <title>Dengue Simulation</title>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script> 
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script type="text/javascript">
         google.charts.load('current', { 'packages': ['corechart', 'controls'] });
         google.charts.setOnLoadCallback(drawChart);
@@ -23,30 +23,30 @@
         function drawChart() {
             var str = $("#parameters").serialize();
             var jsonData = $.ajax({
-                url: "http://127.0.0.1:8000/api/seir?"+str,
+                url: "http://127.0.0.1:8000/api/seir?" + str,
                 dataType: "json",
                 async: false
             }).responseText;
             jsonData = JSON.parse(jsonData);
             var man = [];
             var mos = [];
-            
+
             for (var index = 0; index < jsonData.length; index++) {
                 var element = jsonData[index];
                 element[0] = parseInt(element[0]);
                 man[index] = element.slice(0, 5);
-                mos[index] = element.slice(5); 
-                mos[index].unshift(element[0]);    
-                
+                mos[index] = element.slice(5,11);
+                mos[index].unshift(element[0]);
+
             }
             // console.log(jsonData);
             man.unshift(['date', 'S', 'E', 'I', 'R']);
-            mos.unshift(['date', 'Ev', 'Lv', 'Pv', 'Sm' , 'Em', 'Im']);
-            
+            mos.unshift(['date', 'Ev', 'Lv', 'Pv', 'Sm', 'Em', 'Im']);
+
             var mandashboard = new google.visualization.Dashboard(
-                    document.getElementById('dashboard_man'));
+                document.getElementById('dashboard_man'));
             var mosdashboard = new google.visualization.Dashboard(
-                    document.getElementById('dashboard_mos'));
+                document.getElementById('dashboard_mos'));
 
             var manSlider = new google.visualization.ControlWrapper({
                 'controlType': 'NumberRangeFilter',
@@ -56,55 +56,58 @@
                 }
             });
             var mosSlider = new google.visualization.ControlWrapper({
-                    'controlType': 'NumberRangeFilter',
-                    'containerId': 'filter_mos',
-                    'options': {
-                        'filterColumnLabel': 'date'
-                    }
-                });
+                'controlType': 'NumberRangeFilter',
+                'containerId': 'filter_mos',
+                'options': {
+                    'filterColumnLabel': 'date'
+                }
+            });
             var man_data = google.visualization.arrayToDataTable(man);
             var mos_data = google.visualization.arrayToDataTable(mos);
-            
+
 
             var manChart = new google.visualization.ChartWrapper({
-                    'chartType': 'LineChart',
-                    'containerId': 'man_chart',
-                    'options': {
-                        'width': 900,
-                        'height': 500,
-                        'pieSliceText': 'value',
-                        'legend': 'right',
-                        'title': 'Human Simulation'
-                    }
-                });
+                'chartType': 'LineChart',
+                'containerId': 'man_chart',
+                'options': {
+                    'width': 900,
+                    'height': 500,
+                    'pieSliceText': 'value',
+                    'legend': 'right',
+                    'title': 'Human Simulation'
+                }
+            });
             var mosChart = new google.visualization.ChartWrapper({
-                    'chartType': 'LineChart',
-                    'containerId': 'mos_chart',
-                    'options': {
-                        'width': 900,
-                        'height': 500,
-                        'pieSliceText': 'value',
-                        'legend': 'right',
-                        'title': 'Mosquito Simulation'                        
-                    }
-                });
+                'chartType': 'LineChart',
+                'containerId': 'mos_chart',
+                'options': {
+                    'width': 900,
+                    'height': 500,
+                    'pieSliceText': 'value',
+                    'legend': 'right',
+                    'title': 'Mosquito Simulation'
+                }
+            });
             mandashboard.bind(manSlider, manChart);
             mosdashboard.bind(mosSlider, mosChart);
-            
+
             mandashboard.draw(man_data);
             mosdashboard.draw(mos_data);
-            
+
         }
-</script>
+
+    </script>
     <style>
         body {
             padding-top: 50px;
         }
-        form{
+
+        form {
             padding-top: 10px;
         }
-        #scheme{
-            padding-top: 55px;            
+
+        #scheme {
+            padding-top: 55px;
         }
     </style>
 </head>
@@ -133,92 +136,201 @@
         </div>
     </nav>
     <div class="container">
-    <div class="col-md-9">
-        <div id="dashboard_man">
-            <div id="man_chart" style="margin-left:-50px;"></div>            
-            <div id="filter_man"  style="text-align:center; min-width: 500px"></div>
+        <div class="col-md-9">
+            <div id="dashboard_man">
+                <div id="man_chart" style="margin-left:-50px;"></div>
+                <div id="filter_man" style="text-align:center; min-width: 500px"></div>
 
-        </div>
-
-        <div id="dashboard_mos">
-            <div id="mos_chart" style="margin-left:-50px;"></div>
-            <div id="filter_mos"  style="text-align:center; min-width: 500px"></div>
-
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div id="scheme" class="btn-group" role="group" aria-label="...">
-            <button type="button" class="btn btn-default" id="m0">Default</button>
-            <button type="button" class="btn btn-default" id="m1">M1</button>
-            <button type="button" class="btn btn-default" id="m2">M2</button>
-            <button type="button" class="btn btn-default" id="m3">M3</button>            
-        </div>
-        <form id="parameters">
-            {% autoescape off %}            
-            {% for para,default in pasort %}
-                 {% if default.show == 1 %}
-                    <div class="form-group bas">    
-                 {% else %}
-                    <div class="form-group adv" style="display:none"> 
-                 {% endif %}
-                <label for="para{{para}}">{{default.name | safe}}</label>
-                <input type="text" class="form-control" name="para{{para}}" id="para{{para}}" placeholder="{{para}}" value="{{default.default}}">
             </div>
-            {% endfor %}
-            {% endautoescape %}
-            <a id="advance">Adavance Mode</a><a id="basic" style="display:none" >Basic Mode</a><br><br>
-            <button type="button" class="btn btn-default" onclick="drawChart()">Submit</button>
-        </form>
-    </div>
 
-    </div>
-    
+            <div id="dashboard_mos">
+                <div id="mos_chart" style="margin-left:-50px;"></div>
+                <div id="filter_mos" style="text-align:center; min-width: 500px"></div>
+
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div id="scheme" class="btn-group" role="group" aria-label="...">
+                <button type="button" class="btn btn-default" id="m0">Default</button>
+                <button type="button" class="btn btn-default" id="m1">M1</button>
+                <button type="button" class="btn btn-default" id="m2">M2</button>
+                <button type="button" class="btn btn-default" id="m3">M3</button>
+            </div>
+            <form id="parameters">
+                {% autoescape off %} {% for para,default in pasort %} {% if default.show == 1 %}
+                <div class="form-group bas">
+                    {% else %}
+                    <div class="form-group adv" style="display:none">
+                        {% endif %}
+                        <label for="para{{para}}">{{default.name | safe}}</label>
+                        <input type="text" class="form-control" name="para{{para}}" id="para{{para}}" placeholder="{{para}}" value="{{default.default}}">
+                    </div>
+                    {% endfor %} {% endautoescape %}
+                    <a id="advance">Adavance Mode</a><a id="basic" style="display:none">Basic Mode</a><br><br>
+                    <button type="button" class="btn btn-default" onclick="drawChart()">Submit</button>
+            </form>
+            </div>
+
+        </div>
+
 </body>
 <script>
-    $("#m0").click(function () {
-        var data = parameter = {
-        'N' : 500000,
-        'M' : 0,
-        'beta_h': 0.75,
-        'theta_h': 0.1,
-        'gama': 0.143,
-        'beta_m': 0.375,
-        'theta_m': 0.2,
-        'f_e': 0.276,
-        'f_l': 0.11,
-        'f_p': 0.253,
-        'mu_e': 0.05,
-        'mu_l': 0.05,
-        'mu_p': 0.0167,
-        'mu_m': 0.047,
-        'pi': 1,
-        'delta_l': 0.01,
-        'sigma': 0.5,
-        'budget': 1000000,
-        'perNetCost': 400,
-        'eps': 0.67,
-        'sprayTime': '[10, 100, 150, 200]',
-        'alpha': 1 / 75000,
-        'waterTime': '[]',
-        'k': 1000,
-        'c': 0
-    }
-        for (var key in data) {
-            $("#para"+key).val(data[key]);
-        }
-    });
+        $("#m0").click(function () {
+            var data = parameter = {
+                'N': 526007,
+                'beta_h': 0.75,
+                'theta_h': 0.1,
+                'gama': 0.143,
+                'beta_m': 0.375,
+                'theta_m': 0.2,
+                'f_e': 0.276,
+                'f_l': 0.11,
+                'f_p': 0.253,
+                'mu_e': 0.05,
+                'mu_l': 0.05,
+                'mu_p': 0.0167,
+                'mu_m': 0.047,
+                'pi': 1,
+                'r': 13.6,
+                'sigma': 0.5,
+                'budget': 0,
+                'perWorkCost': 1064,
+                'perNetCost': 90,
+                'eps': 0.67,
+                'perPestCost': 0.38,
+                'perWorkLength': 1 * 1000,
+                'sprayTime': '[]',
+                'area': 5.709296 * 1000000,
+                'roadLength': 527.927 * 1000,
+                'waterTime': '[]',
+                'k': 89742
+            }
+            for (var key in data) {
+                $("#para" + key).val(data[key]);
+            }
+            drawChart();
+        });
+
+        $("#m1").click(function () {
+            var data = parameter = {
+                'N': 526007,
+                'beta_h': 0.75,
+                'theta_h': 0.1,
+                'gama': 0.143,
+                'beta_m': 0.375,
+                'theta_m': 0.2,
+                'f_e': 0.276,
+                'f_l': 0.11,
+                'f_p': 0.253,
+                'mu_e': 0.05,
+                'mu_l': 0.05,
+                'mu_p': 0.0167,
+                'mu_m': 0.047,
+                'pi': 1,
+                'r': 13.6,
+                'sigma': 0.5,
+                'budget': 100 * 10000,
+                'perWorkCost': 1064,
+                'perNetCost': 90,
+                'eps': 0.67,
+                'perPestCost': 0.38,
+                'perWorkLength': 1 * 1000,
+                'sprayTime': '[]',
+                'area': 5.709296 * 1000000,
+                'roadLength': 527.927 * 1000,
+                'waterTime': '[]',
+                'k': 89742
+            }
+            for (var key in data) {
+                $("#para" + key).val(data[key]);
+            }
+            drawChart();
+        });
+
+        $("#m2").click(function () {
+            var data = parameter = {
+                'N': 526007,
+                'beta_h': 0.75,
+                'theta_h': 0.1,
+                'gama': 0.143,
+                'beta_m': 0.375,
+                'theta_m': 0.2,
+                'f_e': 0.276,
+                'f_l': 0.11,
+                'f_p': 0.253,
+                'mu_e': 0.05,
+                'mu_l': 0.05,
+                'mu_p': 0.0167,
+                'mu_m': 0.047,
+                'pi': 1,
+                'r': 13.6,
+                'sigma': 0.5,
+                'budget': 100 * 10000,
+                'perWorkCost': 1064,
+                'perNetCost': 0,
+                'eps': 0.67,
+                'perPestCost': 0.38,
+                'perWorkLength': 1 * 1000,
+                'sprayTime': '[30, 60, 90, 120, 150, 180]',
+                'area': 5.709296 * 1000000,
+                'roadLength': 527.927 * 1000,
+                'waterTime': '[]',
+                'k': 89742
+            }
+            for (var key in data) {
+                $("#para" + key).val(data[key]);
+            }
+            drawChart();
+        });
+
+        $("#m3").click(function () {
+            var data = parameter = {
+                'N': 526007,
+                'beta_h': 0.75,
+                'theta_h': 0.1,
+                'gama': 0.143,
+                'beta_m': 0.375,
+                'theta_m': 0.2,
+                'f_e': 0.276,
+                'f_l': 0.11,
+                'f_p': 0.253,
+                'mu_e': 0.05,
+                'mu_l': 0.05,
+                'mu_p': 0.0167,
+                'mu_m': 0.047,
+                'pi': 1,
+                'r': 13.6,
+                'sigma': 0.5,
+                'budget': 100 * 10000,
+                'perWorkCost': 1064,
+                'perNetCost': 0,
+                'eps': 0.67,
+                'perPestCost': 0.38,
+                'perWorkLength': 1 * 1000,
+                'sprayTime': '[]',
+                'area': 5.709296 * 1000000,
+                'roadLength': 527.927 * 1000,
+                'waterTime': '[30, 60, 90, 120, 150, 180]',
+                'k': 89742
+            }
+            for (var key in data) {
+                $("#para" + key).val(data[key]);
+            }
+            drawChart();
+        });
 
 
-    $("#advance").click(function () {
-        $(".adv").show();
-        $(this).hide();
-        $("#basic").show();
-    });
-    $("#basic").click(function () {
-        $(".adv").hide();
-        $(this).hide();
-        $("#advance").show();
-    });
+        $("#advance").click(function () {
+            $(".adv").show();
+            $(this).hide();
+            $("#basic").show();
+        });
+        $("#basic").click(function () {
+            $(".adv").hide();
+            $(this).hide();
+            $("#advance").show();
+        });
+
 </script>
 
 </html>
