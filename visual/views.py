@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 
 
-def seir(request):
+def model(request):
     
     parameter = {
         # human parameters
@@ -45,5 +45,5 @@ def seir(request):
         'c'         : {'name': r'c'              ,'show': 1 , 'default': 0}
     }
     pasort = sorted(parameter.items(), key=lambda x: x[1]['show'], reverse=True)
-    
+
     return render(request, 'chart.html', {'parameter': parameter, 'pasort': pasort})

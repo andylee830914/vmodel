@@ -21,6 +21,6 @@ from visual import views as visual
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', api.seir, name='seir'),
-    url(r'^visual/', visual.seir, name='seir')
+    url(r'^api/', api.model, name='model'),
+    url(r'^visual/', visual.model, name='model')
 ]

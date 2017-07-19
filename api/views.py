@@ -73,7 +73,7 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
 
 
 
-def seir(request):
+def model(request):
     a_t = np.arange(215)
     # for key in request.GET:
     #     pa = key[4:].strip()
