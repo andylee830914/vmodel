@@ -15,7 +15,7 @@ Solve epidemic model with `scipy` and return the result in JSON.
 Call the API and draw the line chart with Google Chart.
 
 ### Simulate with your model
-- Modified your model `solvr` function which in `api/views.py`
+- Modified your model in `solvr` function which in `api/views.py`
 - Make sure all of your parameters in `model` function which in `api/views.py` set as below ```N=float(request.GET['paraN'])```
 - Make sure your Solver (for example, in this project we use `odeint` which in  `scipy`) is set
 - List all of your parameter dictionary in `model` function which in `visual/views.py` with `name,show,default`
