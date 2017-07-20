@@ -157,7 +157,7 @@
                 <button type="button" class="btn btn-default" id="m3">M3</button>
             </div>
             <form id="parameters">
-                {% autoescape off %} {% for para,default in pasort %} {% if default.show == 1 %}
+                {% autoescape off %} {% for para,default in pasort %} {% if default.show > 0 %}
                 <div class="form-group bas">
                     {% else %}
                     <div class="form-group adv" style="display:none">
@@ -177,6 +177,7 @@
 <script>
         $("#m0").click(function () {
             var data = parameter = {
+                'day':200,
                 'N': 526007,
                 'beta_h': 0.75,
                 'theta_h': 0.1,
@@ -213,6 +214,7 @@
 
         $("#m1").click(function () {
             var data = parameter = {
+                'day': 200,                
                 'N': 526007,
                 'beta_h': 0.75,
                 'theta_h': 0.1,
@@ -249,6 +251,7 @@
 
         $("#m2").click(function () {
             var data = parameter = {
+                'day': 200,                
                 'N': 526007,
                 'beta_h': 0.75,
                 'theta_h': 0.1,
@@ -285,6 +288,7 @@
 
         $("#m3").click(function () {
             var data = parameter = {
+                'day': 200,                
                 'N': 526007,
                 'beta_h': 0.75,
                 'theta_h': 0.1,

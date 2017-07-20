@@ -98,7 +98,8 @@ def solvr(y, t, beta_h, theta_h, gama, beta_m, theta_m, f_e, f_l, f_p,
 
 
 def model(request):
-    a_t = np.arange(200)
+    day = int(request.GET['paraday'])
+    a_t = np.arange(day)
     # for key in request.GET:
     #     pa = key[4:].strip()
     #     if pa == "sprayTime" or pa == "waterTime":
