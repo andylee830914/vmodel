@@ -22,6 +22,8 @@
 
         function drawChart() {
             var str = $("#parameters").serialize();
+            var res = $("#result").serializeArray();
+            
             var jsonData = $.ajax({
                 url: "http://127.0.0.1:8000/api/?" + str,
                 dataType: "json",
@@ -39,9 +41,43 @@
                 mos[index].unshift(element[0]);
 
             }
-            // console.log(jsonData);
+            var arr = [1, 2, 3, 4];
+            for (var i = 0; i < res.length; i++) {
+                var element = Number(res[i].value);
+                if (element < 5) {
+                    index = arr.indexOf(element);
+                        if (index > -1) {
+                            arr.splice(index, 1);
+                        }
+                }
+            }
+            var arr1 = [5, 6, 7, 8, 9, 10];
+            for (var i = 0; i < res.length; i++) {
+                var element = Number(res[i].value);
+                if (element > 4) {
+                    index = arr1.indexOf(element);
+                        if (index > -1) {
+                            arr1.splice(index, 1);
+                        }
+                }
+            }
             man.unshift(['date', 'S', 'E', 'I', 'R']);
             mos.unshift(['date', 'Ev', 'Lv', 'Pv', 'Sm', 'Em', 'Im']);
+            var man1 = man.map(function (val) {
+                for (var index = arr.length-1; index >=0 ; index--) {
+                    var element = arr[index];
+                    val.splice(element, 1);
+                }
+                return val;
+            });
+
+            var mos1 = mos.map(function (val) {
+                for (var index = arr1.length - 1; index >= 0; index--) {
+                    var element = arr1[index]-4;
+                    val.splice(element, 1);
+                }
+                return val;
+            });
 
             var mandashboard = new google.visualization.Dashboard(
                 document.getElementById('dashboard_man'));
@@ -150,13 +186,26 @@
             </div>
         </div>
         <div class="col-md-3">
+            
             <div id="scheme" class="btn-group" role="group" aria-label="...">
                 <button type="button" class="btn btn-default" id="m0">Default</button>
                 <button type="button" class="btn btn-default" id="m1">M1</button>
                 <button type="button" class="btn btn-default" id="m2">M2</button>
                 <button type="button" class="btn btn-default" id="m3">M3</button>
             </div>
-            <form id="parameters">
+            
+            <form id="result">
+                
+                 {% autoescape off %}{% for para1,default1 in resort %}
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="res{{default1.show}}" name="res{{default1.show}}" value="{{default1.show}}" checked> {{default1.name}}
+                </label>
+                 {% if default1.show == 4 or default1.show == 8%}
+                 <br>
+                 {% endif %}
+                 {% endfor %}{% endautoescape %}
+            </form>
+            <form id="parameters">                
                 {% autoescape off %} {% for para,default in pasort %} {% if default.show > 0 %}
                 <div class="form-group bas">
                     {% else %}
@@ -167,7 +216,8 @@
                     </div>
                     {% endfor %} {% endautoescape %}
                     <a id="advance">Adavance Mode</a><a id="basic" style="display:none">Basic Mode</a><br><br>
-                    <button type="button" class="btn btn-default" onclick="drawChart()">Submit</button>
+            <button type="button" class="btn btn-primary btn-lg" onclick="drawChart()">Draw</button>
+                    
             </form>
             </div>
 
@@ -179,10 +229,10 @@
             var data = parameter = {
                 'day':200,
                 'N': 526007,
-                'beta_h': 0.75,
+                'beta_h': 0.375,
                 'theta_h': 0.1,
                 'gama': 0.143,
-                'beta_m': 0.375,
+                'beta_m': 0.75,
                 'theta_m': 0.2,
                 'f_e': 0.276,
                 'f_l': 0.11,
@@ -192,7 +242,7 @@
                 'mu_p': 0.0167,
                 'mu_m': 0.047,
                 'pi': 1,
-                'r': 13.6,
+                'r': 100,
                 'sigma': 0.5,
                 'budget': 0,
                 'perWorkCost': 1064,
@@ -216,10 +266,10 @@
             var data = parameter = {
                 'day': 200,                
                 'N': 526007,
-                'beta_h': 0.75,
+                'beta_h': 0.375,
                 'theta_h': 0.1,
                 'gama': 0.143,
-                'beta_m': 0.375,
+                'beta_m': 0.75,
                 'theta_m': 0.2,
                 'f_e': 0.276,
                 'f_l': 0.11,
@@ -229,7 +279,7 @@
                 'mu_p': 0.0167,
                 'mu_m': 0.047,
                 'pi': 1,
-                'r': 13.6,
+                'r': 100,
                 'sigma': 0.5,
                 'budget': 100 * 10000,
                 'perWorkCost': 1064,
@@ -253,10 +303,10 @@
             var data = parameter = {
                 'day': 200,                
                 'N': 526007,
-                'beta_h': 0.75,
+                'beta_h': 0.375,
                 'theta_h': 0.1,
                 'gama': 0.143,
-                'beta_m': 0.375,
+                'beta_m': 0.75,
                 'theta_m': 0.2,
                 'f_e': 0.276,
                 'f_l': 0.11,
@@ -266,7 +316,7 @@
                 'mu_p': 0.0167,
                 'mu_m': 0.047,
                 'pi': 1,
-                'r': 13.6,
+                'r': 100,
                 'sigma': 0.5,
                 'budget': 100 * 10000,
                 'perWorkCost': 1064,
@@ -290,10 +340,10 @@
             var data = parameter = {
                 'day': 200,                
                 'N': 526007,
-                'beta_h': 0.75,
+                'beta_h': 0.375,
                 'theta_h': 0.1,
                 'gama': 0.143,
-                'beta_m': 0.375,
+                'beta_m': 0.75,
                 'theta_m': 0.2,
                 'f_e': 0.276,
                 'f_l': 0.11,
@@ -303,7 +353,7 @@
                 'mu_p': 0.0167,
                 'mu_m': 0.047,
                 'pi': 1,
-                'r': 13.6,
+                'r': 100,
                 'sigma': 0.5,
                 'budget': 100 * 10000,
                 'perWorkCost': 1064,
