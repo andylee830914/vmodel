@@ -1,0 +1,4 @@
+dj-database-url==0.4.1
+Django==1.11.1
+numpy==1.11.3
+scipy==0.18.1
