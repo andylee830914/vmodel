@@ -25,7 +25,7 @@
             var res = $("#result").serializeArray();
             
             var jsonData = $.ajax({
-                url: "http://127.0.0.1:8000/api/?" + str,
+                url: window.location.protocol +"//"+ window.location.host+"/api/?" + str,
                 dataType: "json",
                 async: false
             }).responseText;
