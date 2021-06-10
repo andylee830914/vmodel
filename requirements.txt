@@ -1,4 +1,4 @@
-Django==1.11.29
+Django==2.2.24
 jsonschema==2.5.1
 numpy==1.11.3
 scipy==0.18.1
